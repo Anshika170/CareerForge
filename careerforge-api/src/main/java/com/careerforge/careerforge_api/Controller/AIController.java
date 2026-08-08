@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.careerforge.careerforge_api.dto.resumeAnalysisResponse;
 import com.careerforge.careerforge_api.service.AIService;
 
 @RestController
@@ -18,10 +19,16 @@ public class AIController {
     }
 
     @PostMapping("/analyze/{resumeId}")
-    public String analyzeResume(@PathVariable Long resumeId) {
+    public resumeAnalysisResponse analyzeResume(@PathVariable Long resumeId) {
 
-        return aiService.analyzeResume(resumeId);
+    
+    System.out.println("🔥 AI CONTROLLER REACHED");
+    System.out.println("Resume ID: " + resumeId);
 
-    }
+    resumeAnalysisResponse result = aiService.analyzeResume(resumeId);
 
+    System.out.println("🔥 AI SERVICE COMPLETED");
+
+    return result;
+}
 }

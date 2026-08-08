@@ -38,41 +38,60 @@ public class ResumeService {
 
     public void uploadResume(MultipartFile file) throws IOException {
 
-        String originalFileName = file.getOriginalFilename();
-        String uniqueFileName = UUID.randomUUID() + "_" + originalFileName;
+    // 1. Get logged-in user from JWT
+    Authentication authentication =
+            SecurityContextHolder.getContext().getAuthentication();
 
-        Path uploadPath = Paths.get("uploads");
+    String email = authentication.getName();
 
-        if (!Files.exists(uploadPath)) {
-            Files.createDirectories(uploadPath);
-        }
+    System.out.println("🔥 UPLOAD USER EMAIL: " + email);
 
-        Path filePath = uploadPath.resolve(uniqueFileName);
+    // 2. Find user from database
+    User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-        Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+    System.out.println("🔥 UPLOAD USER ID: " + user.getId());
 
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    // 3. Get original file name
+    String originalFileName = file.getOriginalFilename();
 
-        String email = authentication.getName();
+    // 4. Generate unique file name
+    String uniqueFileName =
+            UUID.randomUUID() + "_" + originalFileName;
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    // 5. Save file
+    Path uploadPath = Paths.get("uploads");
 
-        // Extract text BEFORE saving
-        String extractedText = pdfService.extractText(filePath);
-
-        Resume resume = new Resume();
-
-        resume.setFileName(originalFileName);
-        resume.setFileType(file.getContentType());
-        resume.setFilePath(filePath.toString());
-        resume.setUploadedAt(LocalDateTime.now());
-        resume.setUser(user);
-        resume.setExtractedText(extractedText);
-
-        resumeRepository.save(resume);
+    if (!Files.exists(uploadPath)) {
+        Files.createDirectories(uploadPath);
     }
 
+    Path filePath = uploadPath.resolve(uniqueFileName);
+
+    Files.copy(
+            file.getInputStream(),
+            filePath,
+            StandardCopyOption.REPLACE_EXISTING
+    );
+
+    // 6. Extract text
+    String extractedText = pdfService.extractText(filePath);
+
+    // 7. Create Resume entity
+    Resume resume = new Resume();
+
+    resume.setFileName(originalFileName);
+    resume.setFilePath(filePath.toString());
+    resume.setFileType(file.getContentType());
+    resume.setExtractedText(extractedText);
+    resume.setUser(user);   // ⭐ THIS IS THE IMPORTANT LINE
+
+    // 8. Save resume
+    resumeRepository.save(resume);
+
+    System.out.println("🔥 RESUME SAVED: " + resume.getId());
+    System.out.println("🔥 RESUME USER ID: " + user.getId());
+}
     public List<ResumeResponse> getMyResumes() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -92,6 +111,7 @@ public class ResumeService {
                         resume.getUploadedAt()))
                 .toList();
     }
+
 
     public Resource downloadResume(Long resumeId) throws IOException {
 

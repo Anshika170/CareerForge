@@ -1,0 +1,89 @@
+<div class="analysis-page">
+  <div class="analysis-dashboard" *ngIf="analysis; else uploadPanel">
+    <header class="analysis-header">
+      <button class="back-btn" (click)="goToDashboard()">← Dashboard</button>
+      <button class="logout-btn" (click)="logout()">Logout</button>
+      <div class="brand">✦ CareerForge</div>
+    </header>
+
+    <section class="hero">
+      <h1>🤖 AI Resume Analysis</h1>
+      <p>
+        Your resume scores higher than
+        <span>72%</span>
+        of resumes analyzed.
+      </p>
+    </section>
+
+    <section class="ats-card">
+      <div class="circle">
+        <div class="score">{{ analysis.atsScore }}</div>
+      </div>
+
+      <h2>ATS Score: {{ analysis.atsScore }}</h2>
+      <p>{{ analysis.summary }}</p>
+    </section>
+
+    <div class="analysis-grid">
+      <div class="analysis-card">
+        <h3>📝 Professional Summary</h3>
+        <p>{{ analysis.summary }}</p>
+      </div>
+
+      <div class="analysis-card">
+        <h3>💪 Strengths</h3>
+        <ul>
+          <li *ngFor="let strength of analysis.strengths">{{ strength }}</li>
+        </ul>
+      </div>
+
+      <div class="analysis-card">
+        <h3>⚠ Missing Skills</h3>
+        <ul>
+          <li *ngFor="let skill of analysis.missingSkills">{{ skill }}</li>
+        </ul>
+      </div>
+
+      <div class="analysis-card">
+        <h3>💡 Suggestions</h3>
+        <ul>
+          <li *ngFor="let suggestion of analysis.suggestions">{{ suggestion }}</li>
+        </ul>
+      </div>
+
+      <div class="analysis-card full-width">
+        <h3>🎯 Recommended Job Roles</h3>
+        <div class="roles">
+          <span class="role-chip" *ngFor="let jobRole of analysis.jobRoles">{{ jobRole }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <ng-template #uploadPanel>
+    <div class="loader">
+      <header class="analysis-header">
+        <button class="back-btn" (click)="goToDashboard()">← Dashboard</button>
+        <button class="logout-btn" (click)="logout()">Logout</button>
+        <div class="brand">✦ CareerForge</div>
+      </header>
+
+      <div class="robot">🤖</div>
+      <h1>Upload a resume to analyze it.</h1>
+      <p>Choose a PDF resume and the AI analysis will appear here.</p>
+
+      <label class="upload-btn">
+        {{ uploading ? 'Analyzing...' : 'Choose Resume' }}
+        <input
+          type="file"
+          accept=".pdf"
+          hidden
+          (change)="onFileSelected($event)"
+          [disabled]="uploading"
+        />
+      </label>
+
+      <p class="upload-hint">PDF files only · Maximum size 5 MB</p>
+    </div>
+  </ng-template>
+</div>

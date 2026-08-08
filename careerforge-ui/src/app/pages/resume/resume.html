@@ -1,0 +1,134 @@
+<div class="resume-page">
+
+  <!-- Header -->
+  <header class="topbar">
+
+    <div class="brand">
+      <span class="brand-icon">✦</span>
+      <span>CareerForge</span>
+    </div>
+
+    <div class="header-actions">
+      <button class="back-btn" (click)="goToDashboard()">
+        ← Dashboard
+      </button>
+
+      <button class="logout-btn" (click)="logout()">
+        Logout
+      </button>
+    </div>
+
+  </header>
+
+
+  <!-- Main -->
+  <main class="content">
+
+    <!-- Page heading -->
+    <section class="page-heading">
+
+      <div>
+        <p class="eyebrow">RESUME MANAGEMENT</p>
+
+        <h1>Manage your resumes</h1>
+
+        <p class="subtitle">
+          Upload, review, and manage your resumes in one place.
+        </p>
+      </div>
+
+    </section>
+
+
+    <!-- Upload area -->
+    <section class="upload-card">
+
+      <div class="upload-icon">
+        ↑
+      </div>
+
+      <h2>Upload a new resume</h2>
+
+      <p>
+        Upload your latest resume in PDF format.
+      </p>
+
+      <label class="upload-btn">
+        {{ uploading ? 'Uploading...' : 'Choose Resume' }}
+
+        <input
+            type="file"
+            accept=".pdf"
+            hidden
+            (change)="onFileSelected($event)"
+            [disabled]="uploading"
+        />
+        </label>
+
+      <span class="upload-hint">
+        PDF files only · Maximum size 5 MB
+      </span>
+
+    </section>
+
+
+    <!-- Resume list -->
+    <section class="resume-section">
+
+      <div class="section-heading">
+
+        <div>
+          <p class="eyebrow">YOUR FILES</p>
+          <h2>My Resumes</h2>
+        </div>
+
+        <span class="resume-count">
+            {{ resumes.length }} Resume{{ resumes.length !== 1 ? 's' : '' }}
+        </span>
+
+      </div>
+
+
+      <!-- Resume card -->
+      <div
+  class="resume-card"
+  *ngFor="let resume of resumes">
+
+  <div class="file-icon">
+    PDF
+  </div>
+
+  <div class="resume-info">
+
+    <h3>{{ resume.fileName }}</h3>
+
+    <p>
+      Uploaded {{ resume.uploadedAt | date:'MMM d, y' }}
+    </p>
+
+  </div>
+
+  <div class="resume-actions">
+
+    <button class="secondary-btn" (click)="downloadResume(resume.id)">
+      Download
+    </button>
+
+    <button class="delete-btn" (click)="deleteResume(resume.id)">
+      Delete
+    </button>
+
+    <button
+      class="analyze-btn"
+      (click)="goToAnalysis(resume.id)">
+      Analyze →
+    </button>
+  </div>
+
+    </div>
+
+    </section>
+
+  </main>
+
+</div>

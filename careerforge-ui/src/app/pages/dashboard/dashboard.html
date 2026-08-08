@@ -1,0 +1,107 @@
+<div class="dashboard">
+
+  <!-- Header -->
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon">✦</span>
+      <span>CareerForge</span>
+    </div>
+
+    <div class="user-section">
+      <span>{{ userName }}</span>
+      <button class="logout-btn" (click)="logout()">Logout</button>
+    </div>
+  </header>
+
+  <!-- Main content -->
+  <main class="content">
+
+    <section class="hero">
+      <div>
+        <p class="eyebrow">YOUR CAREER, FORGED WITH AI</p>
+        <h1>Build your next career move.</h1>
+        <p class="subtitle">
+          Analyze your resume, discover skill gaps, and get personalized
+          career recommendations.
+        </p>
+      </div>
+
+      <div class="hero-icon">
+        ✦
+      </div>
+    </section>
+
+    <!-- Main actions -->
+    <section class="action-grid">
+
+      <div class="action-card">
+        <div class="card-icon">📄</div>
+
+        <div>
+          <h2>My Resume</h2>
+          <p>Upload and manage your resumes.</p>
+        </div>
+
+        <button class="primary-btn" routerLink="/resume">
+          Manage Resume →
+        </button>
+      </div>
+
+      <div class="action-card">
+        <div class="card-icon">🤖</div>
+
+        <div>
+          <h2>AI Resume Analysis</h2>
+          <p>Get an AI-powered review of your resume.</p>
+        </div>
+
+        <button class="primary-btn" routerLink="/analysis">
+          Analyze Resume →
+        </button>
+      </div>
+
+    </section>
+
+    <!-- Career snapshot -->
+    <section class="snapshot">
+
+      <div class="section-heading">
+        <div>
+          <p class="eyebrow">YOUR PROGRESS</p>
+          <h2>Career Snapshot</h2>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <span class="stat-label">ATS SCORE</span>
+          <strong>{{ atsScore ?? '--' }}</strong>
+          <p>Analyze your resume to get your score</p>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-label">SKILLS</span>
+          <strong>{{ skillsCount || '--' }}</strong>
+          <p>Skills detected from your resume</p>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-label">SKILL GAPS</span>
+          <strong>{{ skillGapsCount || '--' }}</strong>
+          <p>Areas recommended for improvement</p>
+        </div>
+
+        <div class="stat-card">
+          <span class="stat-label">RESUMES</span>
+          <strong>{{ resumeCount || '--' }}</strong>
+          <p>Saved resume files in your account</p>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
