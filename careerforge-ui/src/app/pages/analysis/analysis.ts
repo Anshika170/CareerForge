@@ -1,14 +1,15 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
-import { AnalysisService, AnalysisResponse } from '../../services/analysis';
 
-interface ResumeResponse {
-  id: number;
-  fileName: string;
-  fileType: string;
-  uploadedAt: string;
+interface AnalysisResponse {
+  atsScore: number;
+  summary: string;
+  strengths: string[];
+  missingSkills: string[];
+  suggestions: string[];
+  jobRoles: string[];
 }
 
 @Component({
@@ -20,29 +21,116 @@ interface ResumeResponse {
 })
 export class Analysis implements OnInit {
 
-  selectedFile: File | null = null;
-  uploading = false;
   analysis: AnalysisResponse | null = null;
+
+  loading = true;
+
+  currentStep = 0;
+
+  steps = [
+    'Reading your resume...',
+    'Extracting experience...',
+    'Identifying skills...',
+    'Comparing ATS keywords...',
+    'Generating AI recommendations...'
+  ];
+
+  resumeId: number | null = null;
 
   constructor(
     private http: HttpClient,
     private router: Router,
-    private analysisService: AnalysisService
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
-    this.analysis = this.analysisService.analysis;
+
+    console.log('Analysis component loaded');
+
+    this.route.queryParams.subscribe(params => {
+
+      const id = params['resumeId'];
+
+      console.log('Resume ID received:', id);
+
+      if (!id) {
+        console.error('No resumeId found in URL');
+        this.loading = false;
+        return;
+      }
+
+      this.resumeId = Number(id);
+
+      this.startAnalysis();
+    });
   }
 
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
+  startAnalysis(): void {
 
-    if (!input.files || input.files.length === 0) {
+    if (!this.resumeId) {
       return;
     }
 
-    this.selectedFile = input.files[0];
-    this.uploadAndAnalyze();
+    this.loading = true;
+    this.currentStep = 0;
+
+    console.log(
+      'Starting analysis for resume:',
+      this.resumeId
+    );
+
+    const interval = setInterval(() => {
+
+      if (this.currentStep < this.steps.length - 1) {
+
+        this.currentStep++;
+
+      } else {
+
+        clearInterval(interval);
+
+      }
+
+    }, 1000);
+
+    this.http.post<AnalysisResponse>(
+      `http://localhost:8080/api/ai/analyze/${this.resumeId}`,
+      {}
+    ).subscribe({
+
+      next: (response) => {
+
+      console.log('AI Response:', response);
+
+      clearInterval(interval);
+
+      this.currentStep = this.steps.length - 1;
+
+      this.analysis = response;
+
+      console.log('Analysis assigned:', this.analysis);
+
+      this.loading = false;
+      this.cdr.detectChanges();
+
+      console.log('Loading changed to:', this.loading);
+
+    },
+      error: (error) => {
+
+        console.error('Analysis failed:', error);
+
+        clearInterval(interval);
+
+        this.loading = false;
+      }
+
+    });
+  }
+
+  goToResume(): void {
+    this.router.navigate(['/resume']);
   }
 
   goToDashboard(): void {
@@ -50,62 +138,27 @@ export class Analysis implements OnInit {
   }
 
   logout(): void {
-    if (typeof localStorage !== 'undefined') {
-      localStorage.removeItem('token');
-    }
+
+    localStorage.removeItem('token');
+
     this.router.navigate(['/login']);
   }
 
-  uploadAndAnalyze(): void {
-    if (!this.selectedFile) {
-      return;
-    }
+  getScoreMessage(): string {
+  const score = this.analysis?.atsScore ?? 0;
 
-    this.uploading = true;
-
-    const formData = new FormData();
-    formData.append('file', this.selectedFile);
-
-    this.http.post('http://localhost:8080/api/resume/upload', formData, {
-      responseType: 'text'
-    }).subscribe({
-      next: () => {
-        this.http.get<ResumeResponse[]>('http://localhost:8080/api/resume/my').subscribe({
-          next: (resumes) => {
-            const latestResume = resumes[resumes.length - 1];
-
-            if (!latestResume) {
-              this.uploading = false;
-              return;
-            }
-
-            this.http.post(
-              `http://localhost:8080/api/ai/analyze/${latestResume.id}`,
-              {}
-            ).subscribe({
-              next: (response: any) => {
-                this.analysis = response;
-                this.analysisService.analysis = response;
-                this.uploading = false;
-                this.selectedFile = null;
-              },
-              error: (error) => {
-                console.error('Analysis failed:', error);
-                this.uploading = false;
-              }
-            });
-          },
-          error: (error) => {
-            console.error('Resume list load failed:', error);
-            this.uploading = false;
-          }
-        });
-      },
-      error: (error) => {
-        console.error('Upload failed:', error);
-        this.uploading = false;
-      }
-    });
+  if (score >= 80) {
+    return 'Excellent! Your resume is highly optimized for ATS systems.';
   }
 
+  if (score >= 60) {
+    return 'Good! Your resume is reasonably optimized, but there is room for improvement.';
+  }
+
+  if (score >= 40) {
+    return 'Your resume needs some improvements to perform better with ATS systems.';
+  }
+
+  return 'Your resume needs significant optimization for ATS systems.';
+}
 }

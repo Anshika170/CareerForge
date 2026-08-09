@@ -37,7 +37,7 @@ public class SecurityConfig {
                     "/**"
                 ).permitAll()
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/ai/**").permitAll()
+                .requestMatchers("/api/ai/**").authenticated()
                 .anyRequest().authenticated()
             )
             .addFilterBefore(

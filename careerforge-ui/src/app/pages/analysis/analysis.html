@@ -1,89 +1,267 @@
 <div class="analysis-page">
-  <div class="analysis-dashboard" *ngIf="analysis; else uploadPanel">
-    <header class="analysis-header">
-      <button class="back-btn" (click)="goToDashboard()">← Dashboard</button>
-      <button class="logout-btn" (click)="logout()">Logout</button>
-      <div class="brand">✦ CareerForge</div>
-    </header>
 
-    <section class="hero">
-      <h1>🤖 AI Resume Analysis</h1>
+  @if (loading) {
+
+    <!-- ================= AI LOADING ================= -->
+
+    <div class="loader">
+
+      <div class="robot">
+        🤖
+      </div>
+
+      <h1>AI is analyzing your resume</h1>
+
       <p>
-        Your resume scores higher than
-        <span>72%</span>
-        of resumes analyzed.
+        {{ steps[currentStep] }}
       </p>
-    </section>
 
-    <section class="ats-card">
-      <div class="circle">
-        <div class="score">{{ analysis.atsScore }}</div>
-      </div>
-
-      <h2>ATS Score: {{ analysis.atsScore }}</h2>
-      <p>{{ analysis.summary }}</p>
-    </section>
-
-    <div class="analysis-grid">
-      <div class="analysis-card">
-        <h3>📝 Professional Summary</h3>
-        <p>{{ analysis.summary }}</p>
-      </div>
-
-      <div class="analysis-card">
-        <h3>💪 Strengths</h3>
-        <ul>
-          <li *ngFor="let strength of analysis.strengths">{{ strength }}</li>
-        </ul>
-      </div>
-
-      <div class="analysis-card">
-        <h3>⚠ Missing Skills</h3>
-        <ul>
-          <li *ngFor="let skill of analysis.missingSkills">{{ skill }}</li>
-        </ul>
-      </div>
-
-      <div class="analysis-card">
-        <h3>💡 Suggestions</h3>
-        <ul>
-          <li *ngFor="let suggestion of analysis.suggestions">{{ suggestion }}</li>
-        </ul>
-      </div>
-
-      <div class="analysis-card full-width">
-        <h3>🎯 Recommended Job Roles</h3>
-        <div class="roles">
-          <span class="role-chip" *ngFor="let jobRole of analysis.jobRoles">{{ jobRole }}</span>
+      <div class="progress">
+        <div
+          class="progress-bar"
+          [style.width.%]="((currentStep + 1) / steps.length) * 100">
         </div>
       </div>
-    </div>
-  </div>
 
-  <ng-template #uploadPanel>
-    <div class="loader">
+      <div class="steps">
+
+        <div
+          class="step"
+          [class.active]="currentStep >= 0">
+          {{ currentStep >= 0 ? '✅' : '○' }} Reading Resume
+        </div>
+
+        <div
+          class="step"
+          [class.active]="currentStep >= 1">
+          {{ currentStep >= 1 ? '✅' : '○' }} Extracting Skills
+        </div>
+
+        <div
+          class="step"
+          [class.active]="currentStep >= 2">
+          {{ currentStep >= 2 ? '✅' : '○' }} Understanding Experience
+        </div>
+
+        <div
+          class="step"
+          [class.active]="currentStep >= 3">
+          {{ currentStep >= 3 ? '✅' : '○' }} Comparing ATS Standards
+        </div>
+
+        <div
+          class="step"
+          [class.active]="currentStep >= 4">
+          {{ currentStep >= 4 ? '✅' : '○' }} Generating AI Recommendations
+        </div>
+
+      </div>
+
+    </div>
+
+  }
+
+  @else if (analysis) {
+
+    <!-- ================= ANALYSIS DASHBOARD ================= -->
+
+    <div class="analysis-dashboard">
+
       <header class="analysis-header">
-        <button class="back-btn" (click)="goToDashboard()">← Dashboard</button>
-        <button class="logout-btn" (click)="logout()">Logout</button>
-        <div class="brand">✦ CareerForge</div>
+
+        <button
+          class="back-btn"
+          (click)="goToResume()">
+          ← Resume
+        </button>
+
+        <div class="brand">
+          ✦ CareerForge
+        </div>
+
       </header>
 
-      <div class="robot">🤖</div>
-      <h1>Upload a resume to analyze it.</h1>
-      <p>Choose a PDF resume and the AI analysis will appear here.</p>
 
-      <label class="upload-btn">
-        {{ uploading ? 'Analyzing...' : 'Choose Resume' }}
-        <input
-          type="file"
-          accept=".pdf"
-          hidden
-          (change)="onFileSelected($event)"
-          [disabled]="uploading"
-        />
-      </label>
+      <!-- HERO -->
 
-      <p class="upload-hint">PDF files only · Maximum size 5 MB</p>
+      <section class="hero">
+
+        <h1>🤖 AI Resume Analysis</h1>
+
+        <p>
+          Your resume has been analyzed using AI.
+        </p>
+
+      </section>
+
+
+      <!-- ATS SCORE -->
+
+      <section class="ats-card">
+
+        <div
+            class="circle"
+            [style.--score]="analysis.atsScore + '%'">
+
+            <div class="score">
+            {{ analysis.atsScore }}
+            </div>
+
+        </div>
+
+        <h2>
+            ATS Score: {{ analysis.atsScore }}/100
+        </h2>
+
+        <p>
+            {{ getScoreMessage() }}
+        </p>
+
+        </section>
+
+      <!-- ANALYSIS CARDS -->
+
+      <div class="analysis-grid">
+
+
+        <!-- SUMMARY -->
+
+        <div class="analysis-card">
+
+          <h3>
+            📝 Professional Summary
+          </h3>
+
+          <p>
+            {{ analysis.summary }}
+          </p>
+
+        </div>
+
+
+        <!-- STRENGTHS -->
+
+        <div class="analysis-card strengths-card">
+
+            <h3>💪 Strengths</h3>
+
+            <div class="analysis-items">
+
+                <div
+                class="analysis-item strength-item"
+                *ngFor="let strength of analysis.strengths">
+
+                <span class="item-icon">✓</span>
+
+                <span>{{ strength }}</span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- MISSING SKILLS -->
+
+       <div class="analysis-card missing-card">
+
+        <h3>⚠ Missing Skills</h3>
+
+        <div class="analysis-items">
+
+            <div
+            class="analysis-item missing-item"
+            *ngFor="let skill of analysis.missingSkills">
+
+            <span class="item-icon">!</span>
+
+            <span>{{ skill }}</span>
+
+            </div>
+
+        </div>
+
+        </div>
+
+        <!-- SUGGESTIONS -->
+
+       <div class="analysis-card suggestions-card">
+
+        <h3>💡 AI Recommendations</h3>
+
+        <div class="suggestions-list">
+
+            <div
+            class="suggestion-item"
+            *ngFor="let suggestion of analysis.suggestions; let i = index">
+
+            <div class="suggestion-number">
+                {{ i + 1 }}
+            </div>
+
+            <div class="suggestion-content">
+                {{ suggestion }}
+            </div>
+
+            </div>
+
+        </div>
+
+        </div>
+
+        <!-- JOB ROLES -->
+
+        <div class="analysis-card full-width">
+
+          <h3>
+            🎯 Recommended Job Roles
+          </h3>
+
+          <div class="roles">
+
+            <span
+              class="role-chip"
+              *ngFor="let jobRole of analysis.jobRoles">
+
+              {{ jobRole }}
+
+            </span>
+
+          </div>
+
+        </div>
+
+      </div>
+
     </div>
-  </ng-template>
+
+  }
+
+  @else {
+
+    <!-- ================= ERROR / NO RESULT ================= -->
+
+    <div class="loader">
+
+      <div class="robot">
+        ⚠️
+      </div>
+
+      <h1>Unable to analyze resume</h1>
+
+      <p>
+        We couldn't load the analysis for this resume.
+      </p>
+
+      <button
+        class="back-btn"
+        (click)="goToResume()">
+        ← Back to Resumes
+      </button>
+
+    </div>
+
+  }
+
 </div>

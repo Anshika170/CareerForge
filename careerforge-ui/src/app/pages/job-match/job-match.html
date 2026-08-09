@@ -1,0 +1,225 @@
+<div class="job-match-page">
+
+  <header class="topbar">
+
+    <div class="brand">
+      <span class="brand-icon">✦</span>
+      <span>CareerForge</span>
+    </div>
+
+    <button
+      class="back-btn"
+      (click)="goToDashboard()">
+      ← Dashboard
+    </button>
+
+  </header>
+
+
+  <main class="content">
+
+    <section class="page-heading">
+
+      <p class="eyebrow">
+        SMART JOB MATCH
+      </p>
+
+      <h1>
+        Find the best resume for a job
+      </h1>
+
+      <p class="subtitle">
+        Paste a job description and we'll find which of your resumes
+        matches it best.
+      </p>
+
+    </section>
+
+
+    <!-- JOB DESCRIPTION -->
+
+    <section class="jd-card">
+
+      <div class="card-header">
+
+        <div>
+          <h2>📋 Job Description</h2>
+
+          <p>
+            Paste the job description you're applying for.
+          </p>
+        </div>
+
+      </div>
+
+
+      <textarea
+        [(ngModel)]="jobDescription"
+        placeholder="Paste the job description here...
+
+        Example:
+        We are looking for an Angular Developer with experience in
+        TypeScript, RxJS, REST APIs and responsive UI development..."
+                rows="12">
+      </textarea>
+
+
+      <div class="jd-footer">
+
+        <span>
+          {{ jobDescription.length }} characters
+        </span>
+
+        <button
+          class="match-btn"
+          [disabled]="!jobDescription.trim() || loading"
+          (click)="findBestMatch()">
+
+          {{ loading ? 'Analyzing...' : 'Find Best Resume →' }}
+
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- LOADING -->
+   @if (loading) {
+
+  <section class="loading-card">
+
+    <div class="robot">
+      🤖
+    </div>
+
+    <h2>AI is comparing your resumes</h2>
+
+    <p>
+      We're checking your resumes against the job requirements.
+    </p>
+
+    <div class="loading-bar">
+      <div class="loading-progress"></div>
+    </div>
+
+  </section>
+
+}
+@else if (results.length > 0) {
+
+  <section class="results-section">
+
+    <div class="results-heading">
+
+      <div>
+        <p class="eyebrow">MATCH RESULTS</p>
+
+        <h2>Best resume for this job</h2>
+      </div>
+
+      <span class="result-count">
+        {{ results.length }} resumes compared
+      </span>
+
+    </div>
+
+    <div class="resume-results">
+
+      @for (result of results; track result.resumeId; let i = $index) {
+
+        <div
+          class="result-card"
+          [class.best-match]="i === 0">
+
+          @if (i === 0) {
+            <div class="best-badge">
+              🏆 BEST MATCH
+            </div>
+          }
+
+          <div class="result-top">
+
+            <div class="file-icon">
+              PDF
+            </div>
+
+            <div class="resume-info">
+
+              <h3>{{ result.fileName }}</h3>
+
+              <p>Resume #{{ result.resumeId }}</p>
+
+            </div>
+
+            <div class="match-score">
+
+              <strong>{{ result.matchScore }}%</strong>
+
+              <span>Match</span>
+
+            </div>
+
+          </div>
+
+          <div class="match-details">
+
+            <div class="detail">
+
+              <h4>✅ Matching Skills</h4>
+
+              <div class="chips">
+
+                @for (skill of result.matchingSkills; track skill) {
+
+                  <span class="skill-chip">
+                    {{ skill }}
+                  </span>
+
+                }
+
+              </div>
+
+            </div>
+
+            <div class="detail">
+
+              <h4>⚠ Missing Skills</h4>
+
+              <div class="chips">
+
+                @for (skill of result.missingSkills; track skill) {
+
+                  <span class="missing-chip">
+                    {{ skill }}
+                  </span>
+
+                }
+
+              </div>
+
+            </div>
+
+            <div class="reason">
+
+              <h4>Why this match?</h4>
+
+              <p>{{ result.reason }}</p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      }
+
+    </div>
+
+  </section>
+
+}
+
+  </main>
+
+</div>

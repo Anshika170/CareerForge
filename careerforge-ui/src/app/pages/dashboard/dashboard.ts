@@ -49,18 +49,25 @@ export class Dashboard implements OnInit {
     this.http.get<UserProfileResponse>('http://localhost:8080/api/users/me').subscribe({
       next: (profile) => {
         this.userName = `Welcome back, ${profile.firstName || 'User'}`;
+
+        this.http.get<ResumeResponse[]>('http://localhost:8080/api/resume/my').subscribe({
+          next: (resumes) => {
+            this.resumeCount = resumes.length;
+          },
+          error: (error) => {
+            console.error('Failed to load resume snapshot:', error);
+            this.resumeCount = 0;
+          }
+        });
       },
       error: (error) => {
         console.error('Failed to load user profile:', error);
-      }
-    });
 
-    this.http.get<ResumeResponse[]>('http://localhost:8080/api/resume/my').subscribe({
-      next: (resumes) => {
-        this.resumeCount = resumes.length;
-      },
-      error: (error) => {
-        console.error('Failed to load resume snapshot:', error);
+        if (typeof localStorage !== 'undefined') {
+          localStorage.removeItem('token');
+        }
+
+        this.router.navigate(['/login']);
       }
     });
 
@@ -78,4 +85,8 @@ export class Dashboard implements OnInit {
     }
     this.router.navigate(['/login']);
   }
+
+  goToJobMatch(): void {
+  this.router.navigate(['/job-match']);
+}
 }

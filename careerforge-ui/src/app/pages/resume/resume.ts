@@ -1,14 +1,21 @@
-import { Component, OnInit, ChangeDetectorRef, Inject, PLATFORM_ID } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef, Inject, PLATFORM_ID,NgZone  } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { AnalysisService } from '../../services/analysis';
+import { AnalysisResponse, AnalysisService } from '../../services/analysis';
 
 interface ResumeResponse {
   id: number;
   fileName: string;
   fileType: string;
   uploadedAt: string;
+}
+
+interface UserProfileResponse {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
 }
 
 @Component({
@@ -31,7 +38,8 @@ export class Resume implements OnInit {
     private router: Router,
     private cdr: ChangeDetectorRef,
     private analysisService: AnalysisService,
-    @Inject(PLATFORM_ID) private platformId: object
+    @Inject(PLATFORM_ID) private platformId: object,
+    private ngZone: NgZone
   ) {}
 
   ngOnInit(): void {
@@ -41,29 +49,37 @@ export class Resume implements OnInit {
   }
 
   loadResumes(): void {
+    this.http.get<UserProfileResponse>('http://localhost:8080/api/users/me').subscribe({
+      next: () => {
+        this.http.get<ResumeResponse[]>(
+          'http://localhost:8080/api/resume/my'
+        ).subscribe({
+          next: (response) => {
+            console.log('API Response:', response);
 
-    this.http.get<ResumeResponse[]>(
-      'http://localhost:8080/api/resume/my'
-    ).subscribe({
+            this.resumes = [...response];
 
-      next: (response) => {
+            console.log('this.resumes:', this.resumes);
+            console.log('length:', this.resumes.length);
 
-        console.log('API Response:', response);
-
-        // Create a new array reference
-        this.resumes = [...response];
-
-        console.log('this.resumes:', this.resumes);
-        console.log('length:', this.resumes.length);
-
-        // Force UI refresh
-        this.cdr.detectChanges();
+            this.cdr.markForCheck();
+            this.cdr.detectChanges();
+          },
+          error: (error) => {
+            console.error('Failed to load resumes:', error);
+            this.cdr.detectChanges();
+          }
+        });
       },
-
       error: (error) => {
-        console.error('Failed to load resumes:', error);
-      }
+        console.error('Session verification failed while loading resumes:', error);
 
+        if (typeof localStorage !== 'undefined') {
+          localStorage.removeItem('token');
+        }
+
+        this.router.navigate(['/login']);
+      }
     });
   }
 
@@ -109,6 +125,7 @@ export class Resume implements OnInit {
         this.selectedFile = null;
 
         this.loadResumes();
+        this.cdr.detectChanges();
       },
 
       error: (error) => {
@@ -116,6 +133,7 @@ export class Resume implements OnInit {
         console.error('Upload failed:', error);
 
         this.uploading = false;
+        this.cdr.detectChanges();
       }
 
     });
@@ -146,15 +164,35 @@ export class Resume implements OnInit {
   deleteResume(resumeId: number): void {
     this.busyAction = true;
 
-    this.http.delete(`http://localhost:8080/api/resume/${resumeId}`).subscribe({
-      next: () => {
-        this.resumes = this.resumes.filter((resume) => resume.id !== resumeId);
-        this.busyAction = false;
-        this.cdr.detectChanges();
+    console.log('Deleting resume:', resumeId);
+
+    this.http.delete(
+      `http://localhost:8080/api/resume/${resumeId}`,
+      { responseType: 'text' }
+    ).subscribe({
+      next: (response) => {
+        console.log('DELETE API SUCCESS:', response);
+
+        const updatedResumes = this.resumes.filter(
+          resume => resume.id !== resumeId
+        );
+
+        console.log('Before:', this.resumes.length);
+        console.log('After:', updatedResumes.length);
+
+        this.ngZone.run(() => {
+          this.resumes = [...updatedResumes];
+          this.busyAction = false;
+          this.cdr.detectChanges();
+
+          console.log('UI state updated');
+          console.log('Final resumes:', this.resumes);
+        });
       },
       error: (error) => {
         console.error('Delete failed:', error);
         this.busyAction = false;
+        this.cdr.detectChanges();
       }
     });
   }
@@ -171,24 +209,15 @@ export class Resume implements OnInit {
   }
 
   goToAnalysis(resumeId: number): void {
-    this.busyAction = true;
 
-    this.http.post(
-      `http://localhost:8080/api/ai/analyze/${resumeId}`,
-      {}
-    ).subscribe({
-      next: (response: any) => {
-        console.log('AI Response:', response);
-        this.analysisService.analysis = response;
-        this.busyAction = false;
-        this.router.navigate(['/analysis']);
-      },
-      error: (error) => {
-        console.error('Analysis failed:', error);
-        this.busyAction = false;
-        this.router.navigate(['/analysis']);
-      }
-    });
-  }
+  console.log('Starting analysis for resume:', resumeId);
+
+  this.router.navigate(['/analysis'], {
+    queryParams: {
+      resumeId: resumeId
+    }
+  });
+
+}
 
 }

@@ -3,6 +3,7 @@ import { Login } from './pages/login/login';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { Resume } from './pages/resume/resume';
 import { Analysis } from './pages/analysis/analysis';
+import { JobMatch } from './pages/job-match/job-match';
 
 export const routes: Routes = [
       {
@@ -25,5 +26,9 @@ export const routes: Routes = [
 {
   path: 'analysis',
   component: Analysis
+},
+{
+  path: 'job-match',
+  component: JobMatch
 }
 ];
