@@ -147,15 +147,12 @@
 
             <div class="analysis-items">
 
-                <div
-                class="analysis-item strength-item"
-                *ngFor="let strength of analysis.strengths">
-
-                <span class="item-icon">✓</span>
-
-                <span>{{ strength }}</span>
-
-                </div>
+                @for (strength of analysis.strengths; track strength) {
+                  <div class="analysis-item strength-item">
+                    <span class="item-icon">✓</span>
+                    <span>{{ strength }}</span>
+                  </div>
+                }
 
             </div>
 
@@ -170,15 +167,12 @@
 
         <div class="analysis-items">
 
-            <div
-            class="analysis-item missing-item"
-            *ngFor="let skill of analysis.missingSkills">
-
-            <span class="item-icon">!</span>
-
-            <span>{{ skill }}</span>
-
-            </div>
+            @for (skill of analysis.missingSkills; track skill) {
+              <div class="analysis-item missing-item">
+                <span class="item-icon">!</span>
+                <span>{{ skill }}</span>
+              </div>
+            }
 
         </div>
 
@@ -192,19 +186,17 @@
 
         <div class="suggestions-list">
 
-            <div
-            class="suggestion-item"
-            *ngFor="let suggestion of analysis.suggestions; let i = index">
+            @for (suggestion of analysis.suggestions; track suggestion; let i = $index) {
+              <div class="suggestion-item">
+                <div class="suggestion-number">
+                    {{ i + 1 }}
+                </div>
 
-            <div class="suggestion-number">
-                {{ i + 1 }}
-            </div>
-
-            <div class="suggestion-content">
-                {{ suggestion }}
-            </div>
-
-            </div>
+                <div class="suggestion-content">
+                    {{ suggestion }}
+                </div>
+              </div>
+            }
 
         </div>
 
@@ -220,13 +212,11 @@
 
           <div class="roles">
 
-            <span
-              class="role-chip"
-              *ngFor="let jobRole of analysis.jobRoles">
-
-              {{ jobRole }}
-
-            </span>
+            @for (jobRole of analysis.jobRoles; track jobRole) {
+              <span class="role-chip">
+                {{ jobRole }}
+              </span>
+            }
 
           </div>
 

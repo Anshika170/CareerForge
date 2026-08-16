@@ -86,42 +86,42 @@
 
 
       <!-- Resume card -->
-      <div
-  class="resume-card"
-  *ngFor="let resume of resumes">
+      @for (resume of resumes; track resume.id) {
+        <div class="resume-card">
 
-  <div class="file-icon">
-    PDF
-  </div>
+          <div class="file-icon">
+            PDF
+          </div>
 
-  <div class="resume-info">
+          <div class="resume-info">
 
-    <h3>{{ resume.fileName }}</h3>
+            <h3>{{ resume.fileName }}</h3>
 
-    <p>
-      Uploaded {{ resume.uploadedAt | date:'MMM d, y' }}
-    </p>
+            <p>
+              Uploaded {{ resume.uploadedAt | date:'MMM d, y' }}
+            </p>
 
-  </div>
+          </div>
 
-  <div class="resume-actions">
+          <div class="resume-actions">
 
-    <button class="secondary-btn" (click)="downloadResume(resume.id)">
-      Download
-    </button>
+            <button class="secondary-btn" (click)="downloadResume(resume.id)">
+              Download
+            </button>
 
-    <button class="delete-btn" (click)="deleteResume(resume.id)">
-      Delete
-    </button>
+            <button class="delete-btn" (click)="deleteResume(resume.id)">
+              Delete
+            </button>
 
-    <button
-      class="analyze-btn"
-      (click)="goToAnalysis(resume.id)">
-      Analyze →
-    </button>
-  </div>
+            <button
+              class="analyze-btn"
+              (click)="goToAnalysis(resume.id)">
+              Analyze →
+            </button>
+          </div>
 
-    </div>
+        </div>
+      }
 
     </section>
 
