@@ -19,4 +19,19 @@ describe('Dashboard', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  it('should toggle dark mode state and update body class', () => {
+    const bodyClassList = document.body.classList;
+    bodyClassList.remove('dark-mode');
+
+    component.toggleTheme();
+
+    expect(component.isDarkMode).toBeTrue();
+    expect(bodyClassList.contains('dark-mode')).toBeTrue();
+
+    component.toggleTheme();
+
+    expect(component.isDarkMode).toBeFalse();
+    expect(bodyClassList.contains('dark-mode')).toBeFalse();
+  });
 });

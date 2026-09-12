@@ -1,8 +1,9 @@
-import { ChangeDetectorRef, Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { ChangeDetectorRef, Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
+import { ThemeService } from '../../services/theme.service';
 
 interface JobMatchResult {
   resumeId: number;
@@ -23,7 +24,7 @@ interface JobMatchResult {
   templateUrl: './job-match.html',
   styleUrl: './job-match.css'
 })
-export class JobMatch {
+export class JobMatch implements OnInit {
 
   jobDescription = '';
 
@@ -34,8 +35,16 @@ export class JobMatch {
   constructor(
     private router: Router,
     private http: HttpClient,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private themeService: ThemeService,
+    @Inject(PLATFORM_ID) private platformId: object
   ) {}
+
+  ngOnInit(): void {
+    if (isPlatformBrowser(this.platformId)) {
+      this.themeService.initialize();
+    }
+  }
 
   goToDashboard(): void {
     this.router.navigate(['/dashboard']);

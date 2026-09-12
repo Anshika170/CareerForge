@@ -2,7 +2,7 @@ import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router, RouterLink } from '@angular/router';
-// Analysis service removed from dashboard to drop snapshot feature
+import { ThemeService } from '../../services/theme.service';
 
 interface UserProfileResponse {
   firstName: string;
@@ -22,26 +22,38 @@ interface ResumeResponse {
   standalone: true,
   imports: [CommonModule, RouterLink],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css',
+  styleUrls: ['./dashboard.css'],
 })
 export class Dashboard implements OnInit {
 
   userName = 'Welcome back';
+  isDarkMode = false;
   // snapshot-related state removed
 
   constructor(
     private http: HttpClient,
     private router: Router,
+    private themeService: ThemeService,
     @Inject(PLATFORM_ID) private platformId: object
   ) {}
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
+      this.themeService.initialize();
+      this.isDarkMode = this.themeService.isDarkMode;
       this.loadDashboardData();
     }
   }
 
+  toggleTheme(): void {
+    this.isDarkMode = this.themeService.toggleTheme();
+  }
+
   loadDashboardData(): void {
+    if (typeof localStorage === 'undefined' || !localStorage.getItem('token')) {
+      this.router.navigate(['/login']);
+      return;
+    }
 
     this.http.get<UserProfileResponse>(
       'http://localhost:8080/api/users/me'

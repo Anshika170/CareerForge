@@ -47,10 +47,93 @@
 .user-section {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 18px;
 
   font-size: 14px;
   color: #52525b;
+}
+
+.theme-toggle-btn {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  transition: transform 0.2s ease;
+}
+
+.theme-toggle-btn:hover {
+  transform: translateY(-1px) scale(1.02);
+}
+
+.theme-toggle-btn:active {
+  transform: scale(0.98);
+}
+
+.theme-toggle-track {
+  width: 68px;
+  height: 34px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #fef3c7 0%, #ddd6fe 35%, #c4b5fd 100%);
+  border: 1px solid rgba(124, 58, 237, 0.18);
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  transition: all 0.35s ease;
+  box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.7),
+    inset 0 -4px 8px rgba(79, 70, 229, 0.08),
+    0 6px 14px rgba(124, 58, 237, 0.12);
+  overflow: hidden;
+}
+
+.theme-toggle-track::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  border-radius: inherit;
+  background: linear-gradient(120deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.08));
+  opacity: 0.75;
+}
+
+.theme-toggle-thumb {
+  position: relative;
+  z-index: 1;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #fffaf1 0%, #fef3c7 28%, #fbbf24 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.5), 0 6px 12px rgba(251, 191, 36, 0.38);
+  transition: transform 0.35s ease, background 0.35s ease, box-shadow 0.35s ease;
+  transform: translateX(0);
+}
+
+.theme-toggle-thumb::before {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.theme-icon {
+  position: relative;
+  z-index: 2;
+  font-size: 11px;
+  line-height: 1;
+  transform: translateY(-1px);
+  filter: drop-shadow(0 2px 3px rgba(120, 113, 108, 0.25));
+}
+
+.theme-toggle-btn:hover .theme-toggle-track {
+  box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.8),
+    0 10px 22px rgba(124, 58, 237, 0.18);
 }
 
 .logout-btn {

@@ -17,6 +17,9 @@ export class App implements OnInit {
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId) && typeof localStorage !== 'undefined') {
+      const savedTheme = localStorage.getItem('theme');
+      document.body.classList.toggle('dark-mode', savedTheme === 'dark');
+
       const token = localStorage.getItem('token');
 
       if (token) {

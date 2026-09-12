@@ -9,6 +9,15 @@
 
     <div class="user-section">
       <span>{{ userName }}</span>
+
+      <button class="theme-toggle-btn" type="button" (click)="toggleTheme()" [attr.aria-label]="isDarkMode ? 'Switch to light mode' : 'Switch to dark mode'">
+        <span class="theme-toggle-track">
+          <span class="theme-toggle-thumb">
+            <span class="theme-icon">{{ isDarkMode ? '☾' : '☀' }}</span>
+          </span>
+        </span>
+      </button>
+
       <button class="logout-btn" (click)="logout()">Logout</button>
     </div>
   </header>

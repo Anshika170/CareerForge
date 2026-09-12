@@ -3,6 +3,7 @@ import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { AnalysisResponse, AnalysisService } from '../../services/analysis';
+import { ThemeService } from '../../services/theme.service';
 
 interface ResumeResponse {
   id: number;
@@ -39,11 +40,19 @@ export class Resume implements OnInit {
     private cdr: ChangeDetectorRef,
     private analysisService: AnalysisService,
     @Inject(PLATFORM_ID) private platformId: object,
-    private ngZone: NgZone
+    private ngZone: NgZone,
+    private themeService: ThemeService
   ) {}
 
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
+      this.themeService.initialize();
+
+      if (typeof localStorage !== 'undefined' && !localStorage.getItem('token')) {
+        this.router.navigate(['/login']);
+        return;
+      }
+
       this.loadResumes();
     }
   }
